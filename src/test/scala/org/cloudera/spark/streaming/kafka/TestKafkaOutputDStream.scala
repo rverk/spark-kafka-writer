@@ -23,7 +23,7 @@ import org.cloudera.spark.streaming.kafka.util.TestUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, StreamingContext}
-import org.junit.{Before, Test, Assert}
+import org.junit.{After, Before, Test, Assert}
 import org.cloudera.spark.streaming.kafka.KafkaWriter._
 
 import scala.collection.mutable
@@ -42,13 +42,19 @@ class TestKafkaOutputDStream {
 //  conf.set("spark.streaming.clock", "org.apache.spark.streaming.util.ManualClock")
   val ssc = new StreamingContext(conf, Duration.apply(2000))
 
-  @Before def setup() {
+  @Before
+  def setup() {
     testUtil.prepare()
     val topics: java.util.List[String] = new java.util.ArrayList[String](3)
     topics.add("default")
     topics.add("static")
     topics.add("custom")
     testUtil.initTopicList(topics)
+  }
+
+  @After
+  def tearDown(): Unit = {
+    testUtil.tearDown()
   }
 
   @Test

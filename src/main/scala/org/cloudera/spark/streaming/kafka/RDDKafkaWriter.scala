@@ -20,7 +20,7 @@ import java.util.Properties
 
 import scala.reflect.ClassTag
 
-import kafka.producer.{ProducerConfig, Producer, KeyedMessage}
+import kafka.producer.{KeyedMessage, Producer}
 
 import org.apache.spark.rdd.RDD
 
@@ -42,25 +42,8 @@ class RDDKafkaWriter[T: ClassTag](@transient rdd: RDD[T]) extends KafkaWriter[T]
    */
   override def writeToKafka[K, V](producerConfig: Properties,
     serializerFunc: (T) => KeyedMessage[K, V]): Unit = {
-    // Broadcast the producer to avoid sending it every time.
     rdd.foreachPartition(events => {
-//      sc
-      // The ForEachDStream runs the function locally on the driver. So the
-      // ProducerObject from the driver is likely to get serialized and
-      // sent, which is fine - because at that point the Producer itself is
-      // not initialized, so a None is sent over the wire.
-      // Get the producer from that local executor and write!
-      val producer: Producer[K, V] = {
-        if (ProducerObject.isCached) {
-          ProducerObject.getCachedProducer
-            .asInstanceOf[Producer[K, V]]
-        } else {
-          val producer =
-            new Producer[K, V](new ProducerConfig(producerConfig))
-          ProducerObject.cacheProducer(producer)
-          producer
-        }
-      }
+      val producer: Producer[K, V] = ProducerCache.getProducer(producerConfig)
       producer.send(events.map(serializerFunc).toArray: _*)
     })
   }

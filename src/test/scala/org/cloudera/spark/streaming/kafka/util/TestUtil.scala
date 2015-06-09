@@ -17,9 +17,11 @@ Licensed to the Apache Software Foundation (ASF) under one or more
   */
 package org.cloudera.spark.streaming.kafka.util
 
+import java.io.File
 import java.net.{BindException, InetAddress, UnknownHostException}
 import java.util.{List, Properties, Random}
 
+import com.google.common.io.Files
 import kafka.message.MessageAndMetadata
 import org.slf4j.{Logger, LoggerFactory}
 
@@ -44,6 +46,7 @@ class TestUtil {
   private var kafkaLocalPort: Int = 0
   private var zkLocalPort: Int = 0
   private final val logger: Logger = LoggerFactory.getLogger(classOf[TestUtil])
+  private var dataDir: File = null
 
   private def init() {
     try {
@@ -59,8 +62,11 @@ class TestUtil {
   private def startKafkaServer: Boolean = {
     val kafkaProperties: Properties = new Properties
     val zkProperties: Properties = new Properties
+    dataDir = Files.createTempDir()
+    dataDir.deleteOnExit()
     try {
       zkProperties.load(classOf[Class[_]].getResourceAsStream("/zookeeper.properties"))
+      zkProperties.setProperty("dataDir", dataDir.toString)
       var zookeeper: ZooKeeperLocal = null
       var portAssigned = false
       while (!portAssigned) {
