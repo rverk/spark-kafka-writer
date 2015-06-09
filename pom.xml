@@ -6,6 +6,7 @@
 
   <groupId>org.cloudera.spark.streaming.kafka</groupId>
   <artifactId>spark-kafka-writer</artifactId>
+  <name>API to write from Spark and Spark Streaming to Kafka</name>
   <version>0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
@@ -13,7 +14,12 @@
     <dependency>
       <groupId>org.apache.spark</groupId>
       <artifactId>spark-streaming_2.10</artifactId>
-      <version>1.1.0</version>
+      <version>1.3.0</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.spark</groupId>
+      <artifactId>spark-core_2.10</artifactId>
+      <version>1.3.0</version>
     </dependency>
     <dependency>
       <groupId>org.apache.kafka</groupId>
