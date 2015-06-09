@@ -19,10 +19,10 @@ package org.cloudera.spark.streaming.kafka
 import java.util.Properties
 
 import kafka.producer.KeyedMessage
+import org.cloudera.spark.streaming.kafka.util.TestUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
 import org.apache.spark.streaming.{Duration, StreamingContext}
-import org.apache.spark.streaming.kafka.util.TestUtil
 import org.junit.{Before, Test, Assert}
 import org.cloudera.spark.streaming.kafka.KafkaWriter._
 

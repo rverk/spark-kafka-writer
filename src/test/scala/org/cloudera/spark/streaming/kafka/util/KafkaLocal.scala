@@ -15,7 +15,7 @@ Licensed to the Apache Software Foundation (ASF) under one or more
  limitations under the License.
  limitations under the License.
   */
-package org.apache.spark.streaming.kafka.util
+package org.cloudera.spark.streaming.kafka.util
 
 import kafka.server.KafkaConfig
 import kafka.server.KafkaServerStartable

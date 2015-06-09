@@ -45,9 +45,12 @@ object KafkaWriter {
    * @tparam V - The type of the value to serialize to
    * @return
    */
-  implicit def createKafkaOutputWriter[T: ClassTag, K, V](
-    dstream: DStream[T]): KafkaWriter[T] = {
-    new KafkaWriter[T](dstream)
+  implicit def createKafkaOutputWriter[T: ClassTag, K, V](dstream: DStream[T]): KafkaWriter[T] = {
+    new DStreamKafkaWriter[T](dstream)
+  }
+
+  implicit def createKafkaOutputWriter[T: ClassTag, K, V](rdd: RDD[T]): KafkaWriter[T] = {
+    new RDDKafkaWriter[T](rdd)
   }
 }
 
@@ -75,10 +78,9 @@ object KafkaWriter {
  * }
  *
  * }}}
- * @param dstream - The [[DStream]] to be written to Kafka
  *
  */
-class KafkaWriter[T: ClassTag](@transient dstream: DStream[T]) {
+abstract class KafkaWriter[T: ClassTag]() {
 
   /**
    * To write data from a DStream to Kafka, call this function after creating the DStream. Once
@@ -94,32 +96,5 @@ class KafkaWriter[T: ClassTag](@transient dstream: DStream[T]) {
    * @tparam V The type of the value
    *
    */
-  def writeToKafka[K, V](producerConfig: Properties,
-    serializerFunc: T => KeyedMessage[K, V]): Unit = {
-    // Broadcast the producer to avoid sending it every time.
-    val broadcastedConfig = dstream.context.sparkContext.broadcast(producerConfig)
-    def func = (rdd: RDD[T]) => {
-      rdd.foreachPartition(events => {
-        // The ForEachDStream runs the function locally on the driver. So the
-        // ProducerObject from the driver is likely to get serialized and
-        // sent, which is fine - because at that point the Producer itself is
-        // not initialized, so a None is sent over the wire.
-        // Get the producer from that local executor and write!
-        val producer: Producer[K, V] = {
-          if (ProducerObject.isCached) {
-            ProducerObject.getCachedProducer
-              .asInstanceOf[Producer[K, V]]
-          } else {
-            val producer =
-              new Producer[K, V](new ProducerConfig(broadcastedConfig.value))
-            ProducerObject.cacheProducer(producer)
-            producer
-          }
-        }
-        producer.send(events.map(serializerFunc).toArray: _*)
-      })
-    }
-    dstream.foreachRDD(func)
-  }
-
+  def writeToKafka[K, V](producerConfig: Properties, serializerFunc: T => KeyedMessage[K, V]): Unit
 }
