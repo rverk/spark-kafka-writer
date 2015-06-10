@@ -23,6 +23,7 @@ import java.util.{List, Properties, Random}
 
 import com.google.common.io.Files
 import kafka.message.MessageAndMetadata
+import org.apache.commons.io.FileUtils
 import org.slf4j.{Logger, LoggerFactory}
 
 /**
@@ -63,7 +64,6 @@ class TestUtil {
     val kafkaProperties: Properties = new Properties
     val zkProperties: Properties = new Properties
     dataDir = Files.createTempDir()
-    dataDir.deleteOnExit()
     try {
       zkProperties.load(classOf[Class[_]].getResourceAsStream("/zookeeper.properties"))
       zkProperties.setProperty("dataDir", dataDir.toString)
@@ -154,6 +154,7 @@ class TestUtil {
     }
     logger.info("Shutting down the kafka Server.")
     kafkaServer.stop()
+    FileUtils.deleteQuietly(dataDir)
     logger.info("Completed the tearDown phase.")
   }
 
