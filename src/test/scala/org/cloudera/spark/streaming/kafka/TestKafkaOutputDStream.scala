@@ -76,19 +76,20 @@ class TestKafkaOutputDStream {
       ssc.start()
 
     Thread.sleep(10000)
-    var i = 0
     val expectedResults = (0 to 8).map(_.toString).toSeq
-    val actualResults = new ArrayBuffer[String]()
-    while (i < 9) {
-      println(i)
-      val fetchedMsg = new String(
-        testUtil.getNextMessageFromConsumer("default").message.asInstanceOf[Array[Byte]])
-      Assert.assertNotNull(fetchedMsg)
-      actualResults += fetchedMsg
-      i += 1
+    val actualResults = new mutable.HashSet[String]()
+    var moreMessages = true
+    while (moreMessages) {
+      val rawMsg = testUtil.getNextMessageFromConsumer("default")
+      if (rawMsg != null) {
+        val fetchedMsg = new String(rawMsg.message.asInstanceOf[Array[Byte]])
+        Assert.assertNotNull(fetchedMsg)
+        actualResults += fetchedMsg
+      } else {
+        moreMessages = false
+      }
     }
-    val actualResultSorted = actualResults.sorted
-    println(actualResultSorted.mkString)
-    Assert.assertEquals(expectedResults.toSeq, actualResultSorted.toSeq)
+    val actualResultSorted = actualResults.toSeq.sorted
+    Assert.assertEquals(expectedResults, actualResultSorted)
   }
 }

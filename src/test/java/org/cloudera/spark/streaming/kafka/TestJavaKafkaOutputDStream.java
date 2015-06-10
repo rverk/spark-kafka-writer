@@ -19,6 +19,7 @@
 package org.cloudera.spark.streaming.kafka;
 
 import com.google.common.collect.Lists;
+import kafka.message.MessageAndMetadata;
 import kafka.producer.KeyedMessage;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
@@ -77,31 +78,32 @@ public class TestJavaKafkaOutputDStream {
     producerConf.put("key.serializer.class", "kafka.serializer.StringEncoder");
     producerConf.put("metadata.broker.list", testUtil.getKafkaServerUrl());
     producerConf.put("request.required.acks", "1");
-    JavaDStreamKafkaWriter<String> writer = JavaDStreamKafkaWriter$.MODULE$.fromJavaDStream
-      (instream);
+    JavaDStreamKafkaWriter<String> writer = JavaDStreamKafkaWriterFactory.fromJavaDStream(instream);
     writer.writeToKafka(producerConf, new ProcessingFunc());
     ssc.start();
-    //
-//
     Thread.sleep(10000);
     int i = 0;
-    String[] expectedResults = new String[]{"0", "1", "2", "3", "4", "5", "6", "7", "8"};
-    String[] actualResults = new String[9];
-    while (i < 9) {
-      String fetchedMsg = new String(
-        (byte[]) testUtil.getNextMessageFromConsumer("default").message());
-      Assert.assertNotNull(fetchedMsg);
-      actualResults[i] = fetchedMsg;
-      i += 1;
+    Set<String> expectedResults =
+      new TreeSet<String>(Lists.newArrayList("0", "1", "2", "3", "4", "5", "6", "7", "8"));
+    Set<String> actualResults = new TreeSet<String>();
+    boolean moreMessages = true;
+    while (moreMessages) {
+      MessageAndMetadata msg = testUtil.getNextMessageFromConsumer("default");
+      if (msg != null) {
+        String fetchedMsg = new String((byte[]) msg.message());
+        Assert.assertNotNull(fetchedMsg);
+        actualResults.add(fetchedMsg);
+      } else {
+        moreMessages = false;
+      }
     }
-    Arrays.sort(actualResults);
-    Assert.assertArrayEquals(expectedResults, actualResults);
+    Assert.assertEquals(expectedResults, actualResults);
   }
 }
 
-class ProcessingFunc implements Function<String, KeyedMessage<String, byte[]>> {
+  class ProcessingFunc implements Function<String, KeyedMessage<String, byte[]>> {
 
-  public KeyedMessage<String, byte[]> call(String in) throws Exception {
-    return new KeyedMessage<String, byte[]>("default", null, in.getBytes());
+    public KeyedMessage<String, byte[]> call(String in) throws Exception {
+      return new KeyedMessage<String, byte[]>("default", null, in.getBytes());
+    }
   }
-}

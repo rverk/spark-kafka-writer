@@ -154,7 +154,7 @@ class TestUtil {
     }
     logger.info("Shutting down the kafka Server.")
     kafkaServer.stop()
-    FileUtils.deleteQuietly(dataDir)
+    FileUtils.deleteDirectory(dataDir)
     logger.info("Completed the tearDown phase.")
   }
 

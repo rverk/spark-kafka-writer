@@ -35,7 +35,7 @@ class JavaDStreamKafkaWriter[T](dstream: JavaDStream[T])(implicit val classTag: 
   }
 }
 
-object JavaDStreamKafkaWriter {
+object JavaDStreamKafkaWriterFactory {
 
   def fromJavaDStream[T](dstream: JavaDStream[T]): JavaDStreamKafkaWriter[T] = {
     implicit val cmt: ClassTag[T] =

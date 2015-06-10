@@ -35,7 +35,7 @@ class JavaRDDKafkaWriter[T](rdd: JavaRDD[T])(implicit val classTag: ClassTag[T])
   }
 }
 
-object JavaRDDKafkaWriter {
+object JavaRDDKafkaWriterFactory {
 
   def fromJavaRDD[T](rdd: JavaRDD[T]): JavaRDDKafkaWriter[T] = {
     implicit val cmt: ClassTag[T] =
