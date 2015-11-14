@@ -44,4 +44,7 @@ Equivalently, a Java RDD can be written to Kafka in the following format:
 class, and the `producerConf` is a `Properties` object containing the properties to be passed to 
 Kafka Producer.
 
+The current released version is 0.1.0, built against Apache Spark 1.3.0-cdh5.4.8 and  
+Cloudera's distribution of Apache Kafka 0.8.2.0-kafka-1.3.2
+
 [![Build Status](https://travis-ci.org/cloudera/spark-kafka-writer.svg?branch=master)](https://travis-ci.org/cloudera/spark-kafka-writer)
