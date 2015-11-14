@@ -3,7 +3,15 @@ Spark To Kafka Writer
 
 APIs that help in writing data from Spark and Spark Streaming to Kafka. To use this in a Spark 
 application, use Cloudera mvn repos: ``https://repository.cloudera.com/artifactory/cloudera-repos``
-and ``https://repository.cloudera.com/artifactory/libs-snapshot-local`` for SNAPSHOTs. 
+and ``https://repository.cloudera.com/artifactory/libs-snapshot-local`` for SNAPSHOTs.
+
+Latest release artifact info, on maven:
+```
+  repository: https://repository.cloudera.com/artifactory/cloudera-repos
+  groupId: org.cloudera.spark.streaming.kafka
+  artifactId: spark-kafka-writer
+  version: 0.1.0
+```
 
 To write to Kafka from a Spark app in Scala:
 
