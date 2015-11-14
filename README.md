@@ -8,13 +8,15 @@ and ``https://repository.cloudera.com/artifactory/libs-snapshot-local`` for SNAP
 To write to Kafka from a Spark app in Scala:
 
 Import this object in this form:
-``import org.apache.spark.streaming.kafka.KafkaWriter._``
+```
+  import org.apache.spark.streaming.kafka.KafkaWriter._
+```
 
 Once this is done, the `writeToKafka` method can be called on the `DStream` object in this form:
 
-``
+```
   dstream.writeToKafka(producerConfig, serializerFunc)
-`` 
+```
 
 where the `producerConfig` is a properties object that defines the configuration that needs to be
 passed to the Kafka producer, and `serializerFunc` is a function that takes the each element 
@@ -23,21 +25,21 @@ output of this method is passed as is to the Kafka producer).
  
 To write an `RDD` to Kafka, there is an equivalent method, which can be used in the exact same 
 way as above.
-``
+```
   rdd.writeToKafka(producerConfig, serializerFunc)
-``
+```
 
 To write a Java DStream to Kafka:
-``    
+```   
   JavaDStreamKafkaWriter<String> writer = JavaDStreamKafkaWriterFactory.fromJavaDStream(instream);
   writer.writeToKafka(producerConf, new ProcessingFunc());
-``
+```
 
 Equivalently, a Java RDD can be written to Kafka in the following format:
-``    
+```   
   JavaRDDKafkaWriter<String> writer = JavaRDDKafkaWriterFactory.fromJavaRDD(inrdd);
   writer.writeToKafka(producerConf, new ProcessingFunc());
-``
+```
 `ProcessingFunc` must be an implementation of the `org.apache.spark.api.java.function.Function` 
 class, and the `producerConf` is a `Properties` object containing the properties to be passed to 
 Kafka Producer.
