@@ -17,7 +17,7 @@ To write to Kafka from a Spark app in Scala:
 
 Import this object in this form:
 ```
-  import org.apache.spark.streaming.kafka.KafkaWriter._
+  import org.cloudera.spark.streaming.kafka.KafkaWriter._
 ```
 
 Once this is done, the `writeToKafka` method can be called on the `DStream` object in this form:

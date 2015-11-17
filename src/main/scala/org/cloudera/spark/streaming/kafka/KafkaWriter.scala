@@ -28,7 +28,7 @@ import scala.reflect.ClassTag
 /**
  * Import this object in this form:
  * {{{
- *   import org.apache.spark.streaming.kafka.KafkaWriter._
+ *   import org.cloudera.spark.streaming.kafka.KafkaWriter._
  * }}}
  *
  * Once this is done, the `writeToKafka` can be called on the [[DStream]] object in this form:
@@ -57,7 +57,7 @@ object KafkaWriter {
 /**
  *
  * This class can be used to write data to Kafka from Spark Streaming. To write data to Kafka
- * simply `import org.apache.spark.streaming.kafka.KafkaWriter._` in your application and call
+ * simply `import org.cloudera.spark.streaming.kafka.KafkaWriter._` in your application and call
  * `dstream.writeToKafka(producerConf, func)`
  *
  * Here is an example:
