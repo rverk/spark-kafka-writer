@@ -20,7 +20,7 @@ package org.cloudera.spark.streaming.kafka;
 
 import com.google.common.collect.Lists;
 import kafka.message.MessageAndMetadata;
-import kafka.producer.KeyedMessage;
+import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.spark.SparkConf;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.Function;
@@ -74,10 +74,10 @@ public class TestJavaKafkaOutputDStream {
     }
     JavaDStream<String> instream = ssc.queueStream(toBe);
     Properties producerConf = new Properties();
-    producerConf.put("serializer.class", "kafka.serializer.DefaultEncoder");
-    producerConf.put("key.serializer.class", "kafka.serializer.StringEncoder");
-    producerConf.put("metadata.broker.list", testUtil.getKafkaServerUrl());
-    producerConf.put("request.required.acks", "1");
+      producerConf.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer");
+      producerConf.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer");
+      producerConf.put("bootstrap.servers", testUtil.getKafkaServerUrl());
+      producerConf.put("request.required.acks", "1");
     JavaDStreamKafkaWriter<String> writer = JavaDStreamKafkaWriterFactory.fromJavaDStream(instream);
     writer.writeToKafka(producerConf, new ProcessingFunc());
     ssc.start();
@@ -90,6 +90,7 @@ public class TestJavaKafkaOutputDStream {
     while (moreMessages) {
       MessageAndMetadata msg = testUtil.getNextMessageFromConsumer("default");
       if (msg != null) {
+
         String fetchedMsg = new String((byte[]) msg.message());
         Assert.assertNotNull(fetchedMsg);
         actualResults.add(fetchedMsg);
@@ -101,9 +102,9 @@ public class TestJavaKafkaOutputDStream {
   }
 }
 
-  class ProcessingFunc implements Function<String, KeyedMessage<String, byte[]>> {
+  class ProcessingFunc implements Function<String, ProducerRecord<String, byte[]>> {
 
-    public KeyedMessage<String, byte[]> call(String in) throws Exception {
-      return new KeyedMessage<String, byte[]>("default", null, in.getBytes());
+    public ProducerRecord<String, byte[]> call(String in) throws Exception {
+      return new ProducerRecord<String, byte[]>("default", null, in.getBytes());
     }
   }

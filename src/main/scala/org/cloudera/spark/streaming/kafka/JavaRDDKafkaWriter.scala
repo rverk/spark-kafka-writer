@@ -17,11 +17,10 @@
 package org.cloudera.spark.streaming.kafka
 
 import java.util.Properties
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.spark.api.java.function.Function
 
 import scala.reflect.ClassTag
-
-import kafka.producer.KeyedMessage
 
 import org.apache.spark.api.java.JavaRDD
 
@@ -30,7 +29,7 @@ class JavaRDDKafkaWriter[T](rdd: JavaRDD[T])(implicit val classTag: ClassTag[T])
 
   def writeToKafka[K, V](
       producerConfig: Properties,
-      function1: Function[T, KeyedMessage[K,V]]): Unit = {
+      function1: Function[T, ProducerRecord[K,V]]): Unit = {
     rddWriter.writeToKafka(producerConfig, t => function1.call(t))
   }
 }

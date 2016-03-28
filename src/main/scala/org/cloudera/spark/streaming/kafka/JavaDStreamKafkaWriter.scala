@@ -1,11 +1,10 @@
 package org.cloudera.spark.streaming.kafka
 
 import java.util.Properties
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.apache.spark.api.java.function.Function
 
 import scala.reflect.ClassTag
-
-import kafka.producer.KeyedMessage
 
 import org.apache.spark.streaming.api.java.JavaDStream
 
@@ -30,7 +29,7 @@ class JavaDStreamKafkaWriter[T](dstream: JavaDStream[T])(implicit val classTag: 
 
   def writeToKafka[K, V](
     producerConfig: Properties,
-    function1: Function[T, KeyedMessage[K,V]]): Unit = {
+    function1: Function[T, ProducerRecord[K,V]]): Unit = {
     dstreamWriter.writeToKafka(producerConfig, t => function1.call(t))
   }
 }

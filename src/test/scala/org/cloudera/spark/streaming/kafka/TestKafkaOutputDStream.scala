@@ -18,7 +18,7 @@ package org.cloudera.spark.streaming.kafka
 
 import java.util.Properties
 
-import kafka.producer.KeyedMessage
+import org.apache.kafka.clients.producer.ProducerRecord
 import org.cloudera.spark.streaming.kafka.util.TestUtil
 import org.apache.spark.SparkConf
 import org.apache.spark.rdd.RDD
@@ -27,7 +27,6 @@ import org.junit.{After, Before, Test, Assert}
 import org.cloudera.spark.streaming.kafka.KafkaWriter._
 
 import scala.collection.mutable
-import scala.collection.mutable.ArrayBuffer
 
 class TestKafkaOutputDStream {
   private val testUtil: TestUtil = TestUtil.getInstance
@@ -67,12 +66,12 @@ class TestKafkaOutputDStream {
     }
     val instream = ssc.queueStream(toBe)
     val producerConf = new Properties()
-    producerConf.put("serializer.class", "kafka.serializer.DefaultEncoder")
-    producerConf.put("key.serializer.class", "kafka.serializer.StringEncoder")
-    producerConf.put("metadata.broker.list", testUtil.getKafkaServerUrl)
+    producerConf.put("key.serializer", "org.apache.kafka.common.serialization.StringSerializer")
+    producerConf.put("value.serializer", "org.apache.kafka.common.serialization.ByteArraySerializer")
+    producerConf.put("bootstrap.servers", testUtil.getKafkaServerUrl)
     producerConf.put("request.required.acks", "1")
     instream.writeToKafka(producerConf,
-      (x: String) => new KeyedMessage[String,Array[Byte]]("default", null,x.getBytes))
+      (x: String) => new ProducerRecord[String,Array[Byte]]("default", null,x.getBytes))
       ssc.start()
 
     Thread.sleep(10000)
