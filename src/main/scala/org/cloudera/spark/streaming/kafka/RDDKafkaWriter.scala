@@ -24,6 +24,8 @@ import scala.reflect.ClassTag
 
 import org.apache.spark.rdd.RDD
 
+import collection.JavaConverters._
+
 class RDDKafkaWriter[T: ClassTag](@transient rdd: RDD[T]) extends KafkaWriter[T] {
 
   /**
@@ -47,4 +49,13 @@ class RDDKafkaWriter[T: ClassTag](@transient rdd: RDD[T]) extends KafkaWriter[T]
       events.map(serializerFunc).foreach(producer.send)
     })
   }
+
+  override def writeListToKafka[K, V](producerConfig: Properties,
+                                  serializerFunc: (T) => java.util.List[ProducerRecord[K, V]]): Unit = {
+    rdd.foreachPartition(events => {
+      val producer: KafkaProducer[K, V] = ProducerCache.getProducer(producerConfig)
+      events.map(serializerFunc).foreach(_.asScala.foreach(producer.send))
+    })
+  }
+
 }

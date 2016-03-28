@@ -97,4 +97,17 @@ abstract class KafkaWriter[T: ClassTag]() {
    *
    */
   def writeToKafka[K, V](producerConfig: Properties, serializerFunc: T => ProducerRecord[K, V]): Unit
+
+  /**
+   * Same as @see(KafkaWriter#writeToKafka) except this allows a List of ProducerRecords, allowing 0-N
+   * messages to be sent.
+   *
+   * @param producerConfig  The configuration that can be used to connect to Kafka
+   * @param serializerFunc  The function to convert the data from the stream into Kafka
+   *                        List[[ProducerRecord]]s.
+   * @tparam K              The type of the key
+   * @tparam V              The type of the value
+   * @see                   KafkaWriter#writeToKafka
+   */
+  def writeListToKafka[K, V](producerConfig: Properties, serializerFunc: (T) => java.util.List[ProducerRecord[K, V]]): Unit
 }

@@ -32,6 +32,13 @@ class JavaRDDKafkaWriter[T](rdd: JavaRDD[T])(implicit val classTag: ClassTag[T])
       function1: Function[T, ProducerRecord[K,V]]): Unit = {
     rddWriter.writeToKafka(producerConfig, t => function1.call(t))
   }
+
+  def writeListToKafka[K, V](
+      producerConfig: Properties,
+      function1: Function[T, java.util.List[ProducerRecord[K,V]]]): Unit = {
+    rddWriter.writeListToKafka(producerConfig, t => function1.call(t))
+  }
+
 }
 
 object JavaRDDKafkaWriterFactory {

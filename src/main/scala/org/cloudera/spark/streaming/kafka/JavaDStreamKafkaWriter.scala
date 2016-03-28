@@ -8,6 +8,7 @@ import scala.reflect.ClassTag
 
 import org.apache.spark.streaming.api.java.JavaDStream
 
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one or more
  * contributor license agreements.  See the NOTICE file distributed with
@@ -31,6 +32,12 @@ class JavaDStreamKafkaWriter[T](dstream: JavaDStream[T])(implicit val classTag: 
     producerConfig: Properties,
     function1: Function[T, ProducerRecord[K,V]]): Unit = {
     dstreamWriter.writeToKafka(producerConfig, t => function1.call(t))
+  }
+
+  def writeListToKafka[K, V](
+                          producerConfig: Properties,
+                          function1: Function[T, java.util.List[ProducerRecord[K,V]]]): Unit = {
+    dstreamWriter.writeListToKafka(producerConfig, t => function1.call(t))
   }
 }
 
